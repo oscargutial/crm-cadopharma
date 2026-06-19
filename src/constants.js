@@ -1,12 +1,9 @@
 export const USUARIOS = [
-  { nombre: "Oscar Gutiérrez", rol: "Gerencia" },
+  { nombre: "Oscar Gutiérrez", rol: "Gerencia", clave: "saed42q045" },
   { nombre: "Angela Almonte", rol: "Gerencia" },
-  { nombre: "Geovanny Garcia", rol: "Gerencia" },
   { nombre: "Miguelina Sanchez", rol: "Gerencia" },
   { nombre: "Pablo Polanco", rol: "Asesor Comercial" },
   { nombre: "Paola Taveras", rol: "Visitador Médico" },
-  { nombre: "Carolina Garcia", rol: "Asistente Administrativo" },
-  { nombre: "Abraham Sanchez", rol: "Mercadeo Digital" },
 ];
 
 export const REPRESENTANTES = USUARIOS.map(u => u.nombre);
@@ -33,20 +30,8 @@ export const COLORS = {
   success: "#38A169", successBg: "#F0FFF4",
 };
 
-export const SEED_MEDICOS = [
-  { nombre: "Dr. Rafael Pérez", especialidad: "Oncología", institucion: "CEDIMAT", ciudad: "Santo Domingo", telefono: "809-555-0101", email: "rperez@cedimat.do", prioridad: "Alta", notas: "Prescriptor frecuente de Herzuma" },
-  { nombre: "Dra. Carmen Lucía Matos", especialidad: "Hematología", institucion: "ONCOSERV", ciudad: "Santiago", telefono: "809-555-0202", email: "cmatos@oncoserv.do", prioridad: "Alta", notas: "Principal contacto ONCOSERV Santiago" },
-  { nombre: "Dr. Juan Pablo Soto", especialidad: "Oncología", institucion: "Hospital Metropolitano", ciudad: "Santiago", telefono: "809-555-0303", email: "jsoto@hms.do", prioridad: "Media", notas: "Interés en línea Denkpharma" },
-  { nombre: "Dra. María Elena Cruz", especialidad: "Oncología Pediátrica", institucion: "Hospital Robert Reid Cabral", ciudad: "Santo Domingo", telefono: "809-555-0404", email: "mcruz@rrc.do", prioridad: "Alta", notas: "" },
-  { nombre: "Dr. Andrés Familia", especialidad: "Medicina Interna", institucion: "Clínica Corominas", ciudad: "Santiago", telefono: "809-555-0505", email: "afamilia@corominas.do", prioridad: "Baja", notas: "" },
-];
-
-export const SEED_MUESTRAS = [
-  { producto: "Herzuma", stock: 45, unidad_minima: 10, entregadas: 8, lote: "HZ-2025-04" },
-  { producto: "Denkpharma A", stock: 30, unidad_minima: 8, entregadas: 0, lote: "DK-2025-03" },
-  { producto: "Denkpharma B", stock: 12, unidad_minima: 10, entregadas: 3, lote: "DK-2025-03B" },
-  { producto: "Amipharma", stock: 60, unidad_minima: 15, entregadas: 5, lote: "AM-2025-05" },
-];
+export const SEED_MEDICOS = [];
+export const SEED_MUESTRAS = [];
 
 export const fmt = (d) => d ? new Date(d + "T00:00:00").toLocaleDateString("es-DO", { day: "2-digit", month: "short", year: "numeric" }) : "—";
 export const today = () => new Date().toISOString().split("T")[0];

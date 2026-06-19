@@ -3,8 +3,32 @@ import { COLORS, USUARIOS, S } from '../constants';
 
 export default function Login({ onLogin }) {
   const [seleccion, setSeleccion] = useState("");
+  const [clave, setClave] = useState("");
+  const [error, setError] = useState("");
 
   const usuario = USUARIOS.find(u => u.nombre === seleccion);
+  const necesitaClave = usuario?.clave;
+
+  const handleEntrar = () => {
+    if (!seleccion) return;
+    if (necesitaClave) {
+      if (clave !== usuario.clave) {
+        setError("Clave incorrecta. Intenta de nuevo.");
+        setClave("");
+        return;
+      }
+    }
+    setError("");
+    onLogin(seleccion);
+  };
+
+  const iconRol = {
+    "Gerencia": "👔",
+    "Visitador Médico": "🏥",
+    "Asesor Comercial": "💼",
+    "Mercadeo Digital": "📱",
+    "Asistente Administrativo": "📋",
+  };
 
   return (
     <div style={{ height: "100vh", display: "flex", alignItems: "center", justifyContent: "center", background: COLORS.navy }}>
@@ -17,7 +41,7 @@ export default function Login({ onLogin }) {
         <select
           style={{ ...S.select, marginBottom: 12 }}
           value={seleccion}
-          onChange={e => setSeleccion(e.target.value)}
+          onChange={e => { setSeleccion(e.target.value); setClave(""); setError(""); }}
         >
           <option value="">— Selecciona quién eres —</option>
           {USUARIOS.map(u => (
@@ -26,15 +50,31 @@ export default function Login({ onLogin }) {
         </select>
 
         {usuario && (
-          <div style={{ background: COLORS.tealBg, border: `1px solid ${COLORS.teal}`, borderRadius: 8, padding: "8px 14px", marginBottom: 20, fontSize: 13, color: COLORS.teal, fontWeight: 600 }}>
-            {usuario.rol === "Gerencia" ? "👔" : usuario.rol === "Visitador Médico" ? "🏥" : usuario.rol === "Asesor Comercial" ? "💼" : usuario.rol === "Mercadeo Digital" ? "📱" : "📋"} {usuario.rol}
+          <div style={{ background: COLORS.tealBg, border: `1px solid ${COLORS.teal}`, borderRadius: 8, padding: "8px 14px", marginBottom: 16, fontSize: 13, color: COLORS.teal, fontWeight: 600 }}>
+            {iconRol[usuario.rol] || "👤"} {usuario.rol}
+          </div>
+        )}
+
+        {necesitaClave && (
+          <div style={{ marginBottom: 16 }}>
+            <label style={{ ...S.label, textAlign: "left" }}>Clave de acceso</label>
+            <input
+              style={{ ...S.input, letterSpacing: 3, textAlign: "center" }}
+              type="password"
+              placeholder="••••••••••"
+              value={clave}
+              onChange={e => { setClave(e.target.value); setError(""); }}
+              onKeyDown={e => e.key === "Enter" && handleEntrar()}
+              autoFocus
+            />
+            {error && <div style={{ color: COLORS.danger, fontSize: 12, marginTop: 6, fontWeight: 600 }}>{error}</div>}
           </div>
         )}
 
         <button
           style={{ ...S.btn(), width: "100%", padding: "12px 0", fontSize: 15, opacity: seleccion ? 1 : 0.5 }}
           disabled={!seleccion}
-          onClick={() => onLogin(seleccion)}
+          onClick={handleEntrar}
         >
           Entrar al sistema
         </button>
