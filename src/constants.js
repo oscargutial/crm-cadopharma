@@ -1,4 +1,15 @@
-export const REPRESENTANTES = ["Carlos Marte", "Ana Reyes", "Luis Fernández", "María Sánchez"];
+export const USUARIOS = [
+  { nombre: "Oscar Gutiérrez", rol: "Gerencia" },
+  { nombre: "Angela Almonte", rol: "Gerencia" },
+  { nombre: "Geovanny Garcia", rol: "Gerencia" },
+  { nombre: "Miguelina Sanchez", rol: "Gerencia" },
+  { nombre: "Pablo Polanco", rol: "Asesor Comercial" },
+  { nombre: "Paola Taveras", rol: "Visitador Médico" },
+  { nombre: "Carolina Garcia", rol: "Asistente Administrativo" },
+  { nombre: "Abraham Sanchez", rol: "Mercadeo Digital" },
+];
+
+export const REPRESENTANTES = USUARIOS.map(u => u.nombre);
 export const ESPECIALIDADES = ["Oncología", "Hematología", "Oncología Pediátrica", "Medicina Interna", "Cirugía Oncológica"];
 export const PRODUCTOS = ["Herzuma", "Denkpharma A", "Denkpharma B", "Amipharma"];
 
