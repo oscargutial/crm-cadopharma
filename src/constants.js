@@ -10,8 +10,18 @@ export const USUARIOS = [
 ];
 
 export const REPRESENTANTES = USUARIOS.map(u => u.nombre);
-export const ESPECIALIDADES = ["Oncología", "Hematología", "Oncología Pediátrica", "Medicina Interna", "Cirugía Oncológica"];
-export const PRODUCTOS = ["Herzuma", "Denkpharma A", "Denkpharma B", "Amipharma"];
+export const ESPECIALIDADES = ["Oncología", "Hematología", "Oncología Pediátrica", "Medicina Interna", "Cirugía Oncológica", "Ginecología"];
+export const PRODUCTOS = [
+  "ANASTROZOL DENK 1 MG",
+  "CALCIUM ACTIVE DENK 500 MG 20 COMP.",
+  "GRANI-DENK 1 MG/3ML",
+  "LETROZOL DENK 2.5 MG",
+  "MAGNES ACTIVE DENK 300 MG 30 SOBRES",
+  "MAGNES DIRECT DENK 400 MG 30 SOBRES",
+  "ON.SETRON-DENK 4 MG ODT",
+  "ON.SETRON-DENK 8 MG ODT",
+  "ZOLEDRO-DENK 4 MG/5ML",
+];
 
 export const COLORS = {
   navy: "#0F2B4C", navyLight: "#1A3F6F",
@@ -78,3 +88,6 @@ export const S = {
   sectionTitle: { fontSize: 13, fontWeight: 700, color: COLORS.slateLight, textTransform: "uppercase", letterSpacing: 0.5, marginBottom: 14 },
   navItem: (active, colors) => ({ display: "flex", alignItems: "center", gap: 10, padding: "10px 16px", cursor: "pointer", background: active ? "rgba(14,158,139,0.15)" : "transparent", borderLeft: active ? `3px solid ${colors.teal}` : "3px solid transparent", color: active ? colors.tealLight : "rgba(255,255,255,0.65)", fontSize: 13, fontWeight: active ? 600 : 400 }),
 };
+
+export const WHATSAPP_BUSINESS = "18292133777";
+export const ADMIN_USUARIO = "Oscar Gutiérrez";
