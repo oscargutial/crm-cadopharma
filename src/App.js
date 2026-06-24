@@ -30,7 +30,7 @@ const TAB_TITLES = {
 };
 
 export default function App() {
-  const [usuario, setUsuario] = useState(() => localStorage.getItem("crm_usuario") || null);
+  const [usuario, setUsuario] = useState(null);
   const [tab, setTab] = useState("dashboard");
   const [medicos, setMedicos] = useState([]);
   const [visitas, setVisitas] = useState([]);
@@ -117,8 +117,8 @@ export default function App() {
   const updateRecordatorio = async (id, data) => { await supabase.from("recordatorios").update(data).eq("id", id); showSync("✓ Actualizado"); await cargarDatos(); };
   const deleteRecordatorio = async (id) => { if (!esAdmin) return; await supabase.from("recordatorios").delete().eq("id", id); showSync("✓ Eliminado"); await cargarDatos(); };
 
-  const handleLogin = (nombre) => { localStorage.setItem("crm_usuario", nombre); setUsuario(nombre); };
-  const handleLogout = () => { localStorage.removeItem("crm_usuario"); setUsuario(null); };
+  const handleLogin = (nombre) => {  setUsuario(nombre); };
+  const handleLogout = () => {  setUsuario(null); };
 
   // Recordatorios de hoy para el badge
   const hoy = new Date().toISOString().split("T")[0];
