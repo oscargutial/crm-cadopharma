@@ -1,33 +1,49 @@
 import { useState } from 'react';
 import { COLORS, USUARIOS, S } from '../constants';
+import { supabase } from '../supabaseClient';
+
+const ADMIN = "Oscar Gutiérrez";
+
+const iconRol = {
+  "Gerencia": "👔",
+  "Visitador Médico": "🏥",
+  "Asesor Comercial": "💼",
+  "Mercadeo Digital": "📱",
+  "Asistente Administrativo": "📋",
+};
 
 export default function Login({ onLogin }) {
   const [seleccion, setSeleccion] = useState("");
   const [clave, setClave] = useState("");
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const usuario = USUARIOS.find(u => u.nombre === seleccion);
-  const necesitaClave = usuario?.clave;
+  const necesitaClave = seleccion === ADMIN;
 
-  const handleEntrar = () => {
+  const handleEntrar = async () => {
     if (!seleccion) return;
+    setError("");
+
     if (necesitaClave) {
-      if (clave !== usuario.clave) {
+      if (!clave) { setError("Debes ingresar tu clave."); return; }
+      setLoading(true);
+      const { data, error: dbError } = await supabase
+        .from("usuarios_config")
+        .select("clave_hash")
+        .eq("nombre", seleccion)
+        .single();
+      setLoading(false);
+
+      if (dbError || !data) { setError("Error verificando clave. Intenta de nuevo."); return; }
+      if (data.clave_hash !== clave) {
         setError("Clave incorrecta. Intenta de nuevo.");
         setClave("");
         return;
       }
     }
-    setError("");
-    onLogin(seleccion);
-  };
 
-  const iconRol = {
-    "Gerencia": "👔",
-    "Visitador Médico": "🏥",
-    "Asesor Comercial": "💼",
-    "Mercadeo Digital": "📱",
-    "Asistente Administrativo": "📋",
+    onLogin(seleccion);
   };
 
   return (
@@ -57,7 +73,7 @@ export default function Login({ onLogin }) {
 
         {necesitaClave && (
           <div style={{ marginBottom: 16 }}>
-            <label style={{ ...S.label, textAlign: "left" }}>Clave de acceso</label>
+            <label style={{ ...S.label, textAlign: "left" }}>🔒 Clave de administrador</label>
             <input
               style={{ ...S.input, letterSpacing: 3, textAlign: "center" }}
               type="password"
@@ -67,16 +83,20 @@ export default function Login({ onLogin }) {
               onKeyDown={e => e.key === "Enter" && handleEntrar()}
               autoFocus
             />
-            {error && <div style={{ color: COLORS.danger, fontSize: 12, marginTop: 6, fontWeight: 600 }}>{error}</div>}
+            {error && (
+              <div style={{ color: COLORS.danger, fontSize: 12, marginTop: 6, fontWeight: 600, background: COLORS.dangerBg, padding: "6px 10px", borderRadius: 6 }}>
+                ⚠️ {error}
+              </div>
+            )}
           </div>
         )}
 
         <button
-          style={{ ...S.btn(), width: "100%", padding: "12px 0", fontSize: 15, opacity: seleccion ? 1 : 0.5 }}
-          disabled={!seleccion}
+          style={{ ...S.btn(), width: "100%", padding: "12px 0", fontSize: 15, opacity: (seleccion && !loading) ? 1 : 0.5 }}
+          disabled={!seleccion || loading}
           onClick={handleEntrar}
         >
-          Entrar al sistema
+          {loading ? "Verificando…" : "Entrar al sistema"}
         </button>
 
         <div style={{ fontSize: 11, color: COLORS.slateLight, marginTop: 20, lineHeight: 1.6 }}>
