@@ -10,6 +10,7 @@ import Calendario from './components/Calendario';
 import Reportes from './components/Reportes';
 import Recordatorios from './components/Recordatorios';
 import Cumpleanos from './components/Cumpleanos';
+import Seguimiento from './components/Seguimiento';
 
 const MENU = [
   { id: "dashboard", icon: "⬛", label: "Dashboard" },
@@ -19,13 +20,14 @@ const MENU = [
   { id: "calendario", icon: "📅", label: "Calendario" },
   { id: "recordatorios", icon: "🔔", label: "Recordatorios" },
   { id: "cumpleanos", icon: "🎂", label: "Cumpleaños" },
+  { id: "seguimiento", icon: "🔍", label: "Seguimiento" },
   { id: "reportes", icon: "📊", label: "Reportes" },
 ];
 
 const TAB_TITLES = {
   dashboard: "Dashboard general", medicos: "Gestión de médicos",
   visitas: "Registro de visitas", muestras: "Control de muestras",
-  calendario: "Calendario de rutas", reportes: "Reportes y KPIs",
+  calendario: "Calendario de rutas", seguimiento: "Seguimiento Visitadora", reportes: "Reportes y KPIs",
   recordatorios: "Recordatorios", cumpleanos: "Cumpleaños de médicos",
 };
 
@@ -185,6 +187,8 @@ export default function App() {
           {tab === "calendario" && <Calendario visitas={visitas} medicos={medicos} />}
           {tab === "recordatorios" && <Recordatorios recordatorios={recordatorios} onAdd={addRecordatorio} onUpdate={updateRecordatorio} onDelete={deleteRecordatorio} usuario={usuario} medicos={medicos} />}
           {tab === "cumpleanos" && <Cumpleanos medicos={medicos} onUpdate={updateMedico} />}
+          {tab === "seguimiento" && esAdmin && <Seguimiento visitas={visitas} medicos={medicos} />}
+          {tab === "seguimiento" && !esAdmin && <div style={{textAlign:"center",padding:60,color:"#718096"}}>🔒 Acceso restringido a gerencia</div>}
           {tab === "reportes" && <Reportes visitas={visitas} medicos={medicos} muestras={muestras} />}
         </div>
       </div>

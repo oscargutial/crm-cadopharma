@@ -2,21 +2,39 @@ import { useState } from 'react';
 import { COLORS, PRODUCTOS, REPRESENTANTES, RESULTADO_BADGE, S, fmt, today } from '../constants';
 import Modal from './Modal';
 
-export default function Visitas({ visitas, medicos, onAdd, onUpdate, onDelete, usuario }) {
+export default function Visitas({ visitas, medicos, onAdd, onUpdate, onDelete, usuario, esAdmin }) {
   const [modal, setModal] = useState(null);
   const [filtroRep, setFiltroRep] = useState("");
   const [filtroRes, setFiltroRes] = useState("");
   const [form, setForm] = useState({});
   const [saving, setSaving] = useState(false);
+  const [geoStatus, setGeoStatus] = useState("");
 
-  const emptyForm = { medico_id: "", representante: usuario, fecha: today(), hora: "09:00", tipo: "Presencial", productos: [], objetivo: "", resultado: "Pendiente", notas: "", proxima_visita: "" };
+  const emptyForm = { medico_id: "", representante: usuario, fecha: today(), hora: new Date().toTimeString().slice(0,5), tipo: "Presencial", productos: [], objetivo: "", resultado: "Pendiente", notas: "", proxima_visita: "", latitud: null, longitud: null };
 
   const filtered = [...visitas]
     .filter(v => (!filtroRep || v.representante === filtroRep) && (!filtroRes || v.resultado === filtroRes))
     .sort((a, b) => (b.fecha || "").localeCompare(a.fecha || ""));
 
-  const openNuevo = () => { setForm(emptyForm); setModal("nuevo"); };
-  const openEdit = (v) => { setForm({ ...v, productos: Array.isArray(v.productos) ? [...v.productos] : [] }); setModal(v); };
+  const openNuevo = () => {
+    setForm(emptyForm);
+    setModal("nuevo");
+    // Capturar ubicación automáticamente
+    setGeoStatus("📍 Obteniendo ubicación...");
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (pos) => {
+          setForm(f => ({ ...f, latitud: pos.coords.latitude, longitud: pos.coords.longitude }));
+          setGeoStatus("📍 Ubicación capturada ✓");
+        },
+        () => setGeoStatus("📍 Ubicación no disponible")
+      );
+    } else {
+      setGeoStatus("📍 GPS no disponible en este dispositivo");
+    }
+  };
+
+  const openEdit = (v) => { setForm({ ...v, productos: Array.isArray(v.productos) ? [...v.productos] : [] }); setModal(v); setGeoStatus(""); };
   const toggleProducto = (p) => setForm(f => ({ ...f, productos: f.productos?.includes(p) ? f.productos.filter(x => x !== p) : [...(f.productos || []), p] }));
   const fld = (field, val) => setForm(p => ({ ...p, [field]: val }));
 
@@ -28,6 +46,12 @@ export default function Visitas({ visitas, medicos, onAdd, onUpdate, onDelete, u
     else await onUpdate(modal.id, data);
     setSaving(false);
     setModal(null);
+  };
+
+  const abrirMapa = (v) => {
+    if (v.latitud && v.longitud) {
+      window.open(`https://www.google.com/maps?q=${v.latitud},${v.longitud}`, "_blank");
+    }
   };
 
   return (
@@ -50,7 +74,7 @@ export default function Visitas({ visitas, medicos, onAdd, onUpdate, onDelete, u
         <div style={{ overflowX: "auto" }}>
           <table style={S.table}>
             <thead>
-              <tr>{["Médico", "Representante", "Fecha", "Tipo", "Productos", "Resultado", "Próxima", ""].map(h => <th key={h} style={S.th}>{h}</th>)}</tr>
+              <tr>{["Médico", "Representante", "Fecha", "Tipo", "Productos", "Resultado", "Próxima", "Ubic.", esAdmin ? "Acciones" : ""].map(h => <th key={h} style={S.th}>{h}</th>)}</tr>
             </thead>
             <tbody>
               {filtered.map(v => {
@@ -69,17 +93,24 @@ export default function Visitas({ visitas, medicos, onAdd, onUpdate, onDelete, u
                     <td style={S.td}>{v.tipo}</td>
                     <td style={S.td}>
                       {(Array.isArray(v.productos) ? v.productos : []).map(p => (
-                        <span key={p} style={{ display: "inline-block", background: COLORS.tealBg, color: COLORS.teal, fontSize: 10, padding: "2px 6px", borderRadius: 10, marginRight: 3, fontWeight: 600 }}>{p}</span>
+                        <span key={p} style={{ display: "inline-block", background: COLORS.tealBg, color: COLORS.teal, fontSize: 10, padding: "2px 6px", borderRadius: 10, marginRight: 3, marginBottom: 2, fontWeight: 600 }}>{p}</span>
                       ))}
                     </td>
                     <td style={S.td}>{RESULTADO_BADGE[v.resultado]}</td>
                     <td style={S.td}><span style={{ fontSize: 12, color: COLORS.teal, fontWeight: 600 }}>{fmt(v.proxima_visita)}</span></td>
                     <td style={S.td}>
-                      <div style={{ display: "flex", gap: 4 }}>
-                        <button style={{ ...S.btn("ghost"), padding: "4px 8px", fontSize: 12 }} onClick={() => openEdit(v)}>✏️</button>
-                        <button style={{ ...S.btn("danger"), padding: "4px 8px", fontSize: 12 }} onClick={() => { if (window.confirm("¿Eliminar visita?")) onDelete(v.id); }}>🗑</button>
-                      </div>
+                      {v.latitud && v.longitud
+                        ? <button onClick={() => abrirMapa(v)} style={{ ...S.btn("ghost"), padding: "4px 8px", fontSize: 13 }} title="Ver en mapa">📍</button>
+                        : <span style={{ fontSize: 11, color: COLORS.slateLight }}>—</span>}
                     </td>
+                    {esAdmin && (
+                      <td style={S.td}>
+                        <div style={{ display: "flex", gap: 4 }}>
+                          <button style={{ ...S.btn("ghost"), padding: "4px 8px", fontSize: 12 }} onClick={() => openEdit(v)}>✏️</button>
+                          <button style={{ ...S.btn("danger"), padding: "4px 8px", fontSize: 12 }} onClick={() => { if (window.confirm("¿Eliminar visita?")) onDelete(v.id); }}>🗑</button>
+                        </div>
+                      </td>
+                    )}
                   </tr>
                 );
               })}
@@ -91,6 +122,11 @@ export default function Visitas({ visitas, medicos, onAdd, onUpdate, onDelete, u
 
       {modal && (
         <Modal title={modal === "nuevo" ? "Registrar visita" : "Editar visita"} onClose={() => setModal(null)}>
+          {geoStatus && (
+            <div style={{ background: COLORS.tealBg, color: COLORS.teal, padding: "8px 12px", borderRadius: 8, fontSize: 12, fontWeight: 600, marginBottom: 14 }}>
+              {geoStatus}
+            </div>
+          )}
           <div style={S.formRow}>
             <div>
               <label style={S.label}>Médico *</label>
@@ -129,7 +165,7 @@ export default function Visitas({ visitas, medicos, onAdd, onUpdate, onDelete, u
             <label style={S.label}>Productos</label>
             <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginTop: 4 }}>
               {PRODUCTOS.map(p => (
-                <div key={p} onClick={() => toggleProducto(p)} style={{ padding: "5px 12px", borderRadius: 20, fontSize: 12, fontWeight: 600, cursor: "pointer", background: (form.productos || []).includes(p) ? COLORS.teal : COLORS.bg, color: (form.productos || []).includes(p) ? COLORS.white : COLORS.slate, border: `1px solid ${(form.productos || []).includes(p) ? COLORS.teal : COLORS.border}` }}>{p}</div>
+                <div key={p} onClick={() => toggleProducto(p)} style={{ padding: "5px 12px", borderRadius: 20, fontSize: 11, fontWeight: 600, cursor: "pointer", background: (form.productos || []).includes(p) ? COLORS.teal : COLORS.bg, color: (form.productos || []).includes(p) ? COLORS.white : COLORS.slate, border: `1px solid ${(form.productos || []).includes(p) ? COLORS.teal : COLORS.border}` }}>{p}</div>
               ))}
             </div>
           </div>
